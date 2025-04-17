@@ -1,0 +1,5 @@
+# assignment
+# product add ,get Specific, getAllProducts, update,
+#updateUserAllDetails [patch] , available rpoducts id, productId, name, category, price, stock,usename, userId 
+
+# https://devanshkarnwal.pythonanywhere.com/getAllUsers
