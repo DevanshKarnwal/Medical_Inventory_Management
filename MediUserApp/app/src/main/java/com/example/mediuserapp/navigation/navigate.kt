@@ -4,8 +4,10 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.example.mediuserapp.ui.screens.LoginUi
 import com.example.mediuserapp.ui.screens.SignUpUi
+import com.example.mediuserapp.ui.screens.waitingScreen
 import com.example.mediuserapp.viewModel.MyViewModel
 
 @Composable
@@ -14,12 +16,20 @@ fun navigate(viewModel: MyViewModel){
     NavHost(navController = navController, startDestination = Routes.SignUp){
 
         composable<Routes.SignUp>{
-            SignUpUi(viewModel)
+            SignUpUi(viewModel,navController)
         }
 
         composable<Routes.Login>{
-            LoginUi(viewModel)
+            LoginUi(viewModel,navController)
         }
-
+        
+        composable<Routes.WaitingScreen>{
+            val data = it.toRoute<Routes.WaitingScreen>()
+            waitingScreen(
+                viewModel = viewModel,
+                userId = data.userId
+            )
+        }
+        
     }
 }

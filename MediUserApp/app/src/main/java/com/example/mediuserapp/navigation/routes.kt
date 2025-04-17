@@ -10,6 +10,7 @@ sealed class Routes{
     @Serializable
     object Login : Routes()
 
-
+    @Serializable
+    data class WaitingScreen(val userId : String) : Routes()
 
 }
