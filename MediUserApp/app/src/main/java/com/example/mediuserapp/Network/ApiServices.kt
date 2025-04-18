@@ -3,6 +3,7 @@ package com.example.mediuserapp.Network
 import com.example.common.ResultState
 import com.example.mediuserapp.Network.response.CreateUserResponse
 import com.example.mediuserapp.Network.response.LoginUserResponse
+import com.example.mediuserapp.Network.response.SpecificUserResponse
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import retrofit2.Response
@@ -29,5 +30,11 @@ interface ApiServices {
         @Field("email") email: String,
         @Field("password") password: String,
     ): Response<LoginUserResponse>
+
+    @FormUrlEncoded
+    @POST("getSpecificUser")
+    suspend fun specificUser(
+        @Field("user_id") user_id: String,
+    ) : Response<SpecificUserResponse>
 
 }

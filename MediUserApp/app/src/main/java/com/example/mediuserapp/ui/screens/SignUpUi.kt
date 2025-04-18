@@ -1,6 +1,7 @@
 package com.example.mediuserapp.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -8,10 +9,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -34,6 +37,25 @@ fun SignUpUi(viewModel: MyViewModel, navController: NavHostController) {
     val pincode = remember { mutableStateOf("") }
     val address = remember { mutableStateOf("") }
     val focusManager = LocalFocusManager.current
+    val state = viewModel.createUserState.collectAsState()
+
+
+    when {
+        state.value?.isLoading == true -> {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
+            }
+        }
+
+        state.value?.error != null -> {
+            Text(text = state.value?.error.toString())
+        }
+        state.value?.success != null -> {
+            Text(text = state.value?.success!!.message)
+            if (state.value?.success!!.status == 200)
+                navController.navigate(Routes.Login)
+        }
+    }
 
     Column(
         modifier = Modifier.fillMaxSize(),

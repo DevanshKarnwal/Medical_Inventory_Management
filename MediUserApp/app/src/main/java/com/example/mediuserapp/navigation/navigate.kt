@@ -7,6 +7,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.mediuserapp.ui.screens.LoginUi
 import com.example.mediuserapp.ui.screens.SignUpUi
+import com.example.mediuserapp.ui.screens.homeScreenUi
 import com.example.mediuserapp.ui.screens.waitingScreen
 import com.example.mediuserapp.viewModel.MyViewModel
 
@@ -27,7 +28,14 @@ fun navigate(viewModel: MyViewModel){
             val data = it.toRoute<Routes.WaitingScreen>()
             waitingScreen(
                 viewModel = viewModel,
-                userId = data.userId
+                userId = data.userId,
+                navController = navController
+            )
+        }
+        composable<Routes.HomeScreen>{
+            val data = it.toRoute<Routes.HomeScreen>()
+            homeScreenUi(
+                userId = data.userId,
             )
         }
         
