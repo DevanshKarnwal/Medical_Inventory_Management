@@ -1,5 +1,6 @@
 package com.example.mediadminapp.ui.screens
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -29,6 +30,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.mediadminapp.network.response.Message
@@ -106,14 +111,18 @@ fun UserInfoCard(user: Message) {
                 .fillMaxWidth()
                 .padding(10.dp)
         ) {
-            Text(
-                text = user.name,
-                modifier = Modifier.fillMaxWidth()
-            )
-            Text(
-                text = user.phoneNumber,
-                modifier = Modifier.fillMaxWidth()
-            )
+            Text(buildAnnotatedString {
+                withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                    append("Name : ")
+                }
+                append(user.name)
+            })
+            Text(buildAnnotatedString {
+                withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                    append("Number : ")
+                }
+                append(user.phoneNumber)
+            })
 
             Row(
                 modifier = Modifier
@@ -121,7 +130,7 @@ fun UserInfoCard(user: Message) {
                     .wrapContentHeight(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(text = if (user.isApproved == 1) "Approved" else "Not Approved")
+                Text(text = if (user.isApproved == 1) "Approved" else "Not Approved", fontWeight = FontWeight.Bold)
                 if (user.isApproved == 0)
                     Icon(
                         imageVector = Icons.Default.Clear,
@@ -148,7 +157,7 @@ fun UserInfoCard(user: Message) {
                     .wrapContentHeight(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(text = if (user.block == 1) "Blocked" else "Unblocked")
+                Text(text = if (user.block == 1) "Blocked" else "Unblocked" , fontWeight = FontWeight.Bold)
                 if (user.block == 1)
                     Icon(
                         imageVector = Icons.Default.Clear,
@@ -169,9 +178,22 @@ fun UserInfoCard(user: Message) {
                     )
             }
 
-            if (isExpanded.value) {
-                Text(text = user.address)
-                Text(text = user.email)
+            AnimatedVisibility(isExpanded.value) {
+
+                Text(buildAnnotatedString {
+                    withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                        append("Address : ")
+                    }
+                    append(user.address)
+                })
+            }
+            AnimatedVisibility(isExpanded.value) {
+                Text(buildAnnotatedString {
+                    withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                        append("Email : ")
+                    }
+                    append(user.email)
+                })
             }
         }
     }
