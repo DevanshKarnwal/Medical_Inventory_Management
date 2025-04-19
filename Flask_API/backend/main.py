@@ -3,7 +3,7 @@ from createTableOperation import createTable
 from addOperation import createUser, createProduct,createOrderDetails,createSellHistory,createAvailableProducts
 from authUser import authenticate_user
 from readOperation import getAllUsers, getSpecificUser, getAllProducts, getSpecificProduct , getAllOrderDetails, getSpecificOrderDetails,getAllSellHistory,getSpecificSellHistory , getAllAvailableProducts, getSpecificAvailableProduct
-from updateOperation import update_approve_user, updateUserAllDetails, updateProduct,updateOrderApproval,updateOrderDetails,updateSellHistory,updateAvailableProducts
+from updateOperation import update_approve_user,update_block_user, updateUserAllDetails, updateProduct,updateOrderApproval,updateOrderDetails,updateSellHistory,updateAvailableProducts
 
 from deleteOperation import deleteUser, deleteProduct, deleteOrderDetails, deleteSellHistory, deleteAvailableProducts
 
@@ -90,6 +90,16 @@ def approve_User():
         approve = request.form['approve']
         update_approve_user(user_id, approve)
         return jsonify({"message" : "User approval status updated", "status" : 200})
+    except Exception as error:
+        return jsonify({"message" : str(error), "status" : 400})
+
+@app.route('/blockUser',methods = ['PATCH'])
+def block_User():
+    try:
+        user_id = request.form['user_id']
+        block = request.form['block']
+        update_block_user(user_id, block)
+        return jsonify({"message" : "User block status updated", "status" : 200})
     except Exception as error:
         return jsonify({"message" : str(error), "status" : 400})
     

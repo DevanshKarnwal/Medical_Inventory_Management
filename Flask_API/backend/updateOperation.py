@@ -13,6 +13,18 @@ def update_approve_user(userId, approve):
     )
     conn.commit()
     conn.close()
+
+def update_block_user(userId, block):
+    conn = sqlite3.connect("my_medicalShop.db")
+    cursor = conn.cursor()
+    cursor.execute(
+        '''
+            UPDATE Users SET block = ? WHERE user_id = ?
+        ''',
+        (block, userId)
+    )
+    conn.commit()
+    conn.close()
     
 
 def updateUserAllDetails(userId, name, address, email, phoneNumber, pincode,password):
