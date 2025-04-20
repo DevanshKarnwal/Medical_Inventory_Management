@@ -97,7 +97,7 @@ def approve_User():
 def block_User():
     try:
         user_id = request.form['user_id']
-        block = request.form['block']
+        block =  request.form['block']
         update_block_user(user_id, block)
         return jsonify({"message" : "User block status updated", "status" : 200})
     except Exception as error:

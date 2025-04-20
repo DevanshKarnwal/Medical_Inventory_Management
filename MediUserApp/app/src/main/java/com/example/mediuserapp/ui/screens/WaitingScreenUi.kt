@@ -3,6 +3,7 @@ package com.example.mediuserapp.ui.screens
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,23 +24,35 @@ fun waitingScreen(userId: String, viewModel: MyViewModel, navController: NavHost
         verticalArrangement = Arrangement.Center
     ) {
         val state = viewModel.specificUserState.collectAsState()
-        LaunchedEffect(1) {
+        LaunchedEffect(key1 = Unit) {
             viewModel.getSpecificUser(userId)
         }
         Text("This is waiting Screen")
-        when{
-            state.value?.isLoading == true ->{
+        when {
+            state.value?.isLoading == true -> {
                 CircularProgressIndicator()
             }
-            state.value?.error != null ->{
+
+            state.value?.error != null -> {
                 Text(text = state.value?.error.toString())
             }
-            state.value?.success != null ->{
-                if(state.value?.success!!.status == 200){
-                    if(state.value?.success!!.message.isApproved == 0){
-                        Text("Currently you are not approved")
-                    }
-                    else{
+
+            state.value?.success != null -> {
+                if (state.value?.success!!.status == 200) {
+                    if (state.value?.success!!.message.isApproved == 0) {
+                        Column(
+                            modifier = Modifier.fillMaxSize(),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text("Currently you are not approved")
+                            Button(onClick = {
+                                viewModel.getSpecificUser(userId)
+                            }) {
+                                Text("Refresh")
+                            }
+                        }
+                    } else {
                         navController.navigate(Routes.HomeScreen(userId))
                     }
                 }
