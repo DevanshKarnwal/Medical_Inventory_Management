@@ -4,8 +4,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.common.ResultState
+import com.example.mediuserapp.Network.response.AllProductsResponse
 import com.example.mediuserapp.Network.response.CreateUserResponse
 import com.example.mediuserapp.Network.response.LoginUserResponse
+import com.example.mediuserapp.Network.response.SpecificProductResponse
 import com.example.mediuserapp.Network.response.SpecificUserResponse
 import com.example.mediuserapp.Repo.Repo
 import kotlinx.coroutines.Dispatchers
@@ -21,6 +23,10 @@ class MyViewModel : ViewModel() {
     val loginUserState = _loginUserState.asStateFlow()
     private val _specificUserState = MutableStateFlow<SpecificUserState?>(null)
     val specificUserState = _specificUserState.asStateFlow()
+    private val _getAllProductsState = MutableStateFlow<GetAllProducts?>(null)
+    val getAllProductsState = _getAllProductsState.asStateFlow()
+    private val _getSpecificProductState = MutableStateFlow<GetSpecificProduct?>(null)
+    val getSpecificProductState = _getSpecificProductState.asStateFlow()
 
 
     fun createUser(
@@ -93,6 +99,53 @@ class MyViewModel : ViewModel() {
             }
         }
     }
+    fun getSpecificProduct(product_id: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val response = repo.getSpecificProduct(product_id).collect {
+
+                when (it) {
+                    is ResultState.Loading -> {
+                        _getSpecificProductState.value = GetSpecificProduct(isLoading = true)
+                    }
+
+                    is ResultState.Success -> {
+                        _getSpecificProductState.value =
+                            GetSpecificProduct(success = it.data, isLoading = false)
+                    }
+
+                    is ResultState.Error -> {
+                        _getSpecificProductState.value =
+                            GetSpecificProduct(error = it.exception.message, isLoading = false)
+                    }
+                }
+            }
+
+        }
+    }
+    fun getAllProducts() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val response = repo.getAllProducts().collect {
+                when (it) {
+                    is ResultState.Loading -> {
+                        _getAllProductsState.value = GetAllProducts(isLoading = true)
+                    }
+
+                    is ResultState.Success -> {
+                        _getAllProductsState.value =
+                            GetAllProducts(success = it.data, isLoading = false)
+                    }
+
+                    is ResultState.Error -> {
+                        _getAllProductsState.value =
+                            GetAllProducts(error = it.exception.message, isLoading = false)
+                    }
+
+                }
+
+            }
+
+        }
+    }
 
 }
 data class LoginUserState(
@@ -112,3 +165,17 @@ data class SpecificUserState(
     val error : String? = null
 
 )
+
+data class GetAllProducts(
+    val isLoading: Boolean = false,
+    val success: AllProductsResponse? = null,
+    val error: String? = null
+)
+
+
+data class GetSpecificProduct(
+    val isLoading: Boolean = false,
+    val success: SpecificProductResponse? = null,
+    val error: String? = null
+)
+

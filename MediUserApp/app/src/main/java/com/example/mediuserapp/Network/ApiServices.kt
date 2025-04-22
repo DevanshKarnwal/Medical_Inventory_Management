@@ -1,14 +1,17 @@
 package com.example.mediuserapp.Network
 
 import com.example.common.ResultState
+import com.example.mediuserapp.Network.response.AllProductsResponse
 import com.example.mediuserapp.Network.response.CreateUserResponse
 import com.example.mediuserapp.Network.response.LoginUserResponse
+import com.example.mediuserapp.Network.response.SpecificProductResponse
 import com.example.mediuserapp.Network.response.SpecificUserResponse
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import retrofit2.Response
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
+import retrofit2.http.GET
 import retrofit2.http.POST
 
 interface ApiServices {
@@ -36,5 +39,15 @@ interface ApiServices {
     suspend fun specificUser(
         @Field("user_id") user_id: String,
     ) : Response<SpecificUserResponse>
+
+    @GET("getAllProducts")
+    suspend fun getAllProducts(): Response<AllProductsResponse>
+
+    @FormUrlEncoded
+    @POST("getSpecificProduct")
+    suspend fun getSpecificProduct(
+        @Field("product_id") product_id: String
+    ): Response<SpecificProductResponse>
+
 
 }

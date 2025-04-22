@@ -42,6 +42,8 @@ android {
 
 dependencies {
 
+    implementation("androidx.datastore:datastore-preferences:1.1.4")
+
     implementation("org.jetbrains.androidx.navigation:navigation-compose:2.8.0-alpha10")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0")
 

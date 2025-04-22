@@ -10,6 +10,7 @@ import com.example.mediadminapp.network.response.AllUsersResponse
 import com.example.mediadminapp.network.response.ApproveUserResponse
 import com.example.mediadminapp.network.response.BlockUserResponse
 import com.example.mediadminapp.network.response.CreateProductResponse
+import com.example.mediadminapp.network.response.SpecificProductResponse
 import com.example.mediadminapp.network.response.SpecificUserResponse
 
 
@@ -111,6 +112,20 @@ class Repo {
         catch (e : Exception){
             emit(ResultState.Error(e))
         }
+    }
+
+    suspend fun getSpecificProduct(product_id : String) : Flow<ResultState<SpecificProductResponse>> = flow {
+        emit(ResultState.Loading)
+        try{
+            val response = ApiProvider.provideApiService().getSpecificProduct(product_id)
+            if (response.isSuccessful && response.body() != null)
+                emit(ResultState.Success(response.body()!!))
+            else
+                emit(ResultState.Error(Exception(response.message())))
+        }catch (e : Exception){
+            emit(ResultState.Error(e))
+        }
+
     }
 
 }

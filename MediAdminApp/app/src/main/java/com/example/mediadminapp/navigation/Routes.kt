@@ -18,6 +18,8 @@ sealed class Routes {
     @Serializable
     data class specificProductScreenRoute(val productId : String) : Routes()
 
+    @Serializable
+    object orderScreenRoute : Routes()
 
 
 }

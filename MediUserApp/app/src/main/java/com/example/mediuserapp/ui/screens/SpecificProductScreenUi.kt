@@ -1,12 +1,8 @@
-package com.example.mediadminapp.ui.screens
+package com.example.mediuserapp.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -14,16 +10,14 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.unit.dp
-import com.example.mediadminapp.viewModel.myViewModel
+import com.example.mediuserapp.viewModel.MyViewModel
 
 @Composable
-fun SpecificProductScreenUi(productId: String, viewModel: myViewModel) {
+fun SpecificProductScreenUi(productId: String, viewModel: MyViewModel) {
     val state = viewModel.getSpecificProductState.collectAsState()
     val product = state.value?.success?.message
     LaunchedEffect(1) {
@@ -33,7 +27,7 @@ fun SpecificProductScreenUi(productId: String, viewModel: myViewModel) {
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
-    ){
+    ) {
         when {
             state.value?.isLoading == true -> {
                 CircularProgressIndicator()
@@ -67,15 +61,5 @@ fun SpecificProductScreenUi(productId: String, viewModel: myViewModel) {
             }
             append(product?.stock.toString())
         })
-        Spacer(modifier = Modifier.height(15.dp))
-        Button(
-            onClick = {},
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Red,
-                contentColor = Color.White
-            )
-        ) {
-            Text("Delete Product")
-        }
     }
 }
