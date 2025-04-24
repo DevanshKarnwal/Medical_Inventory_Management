@@ -14,9 +14,12 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -35,6 +38,8 @@ import com.example.mediuserapp.ui.screens.homeScreenUi
 import com.example.mediuserapp.ui.screens.userProfileUi
 import com.example.mediuserapp.ui.screens.waitingScreen
 import com.example.mediuserapp.viewModel.MyViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
 fun navigate(viewModel: MyViewModel) {
@@ -52,19 +57,33 @@ fun navigate(viewModel: MyViewModel) {
         Routes.Login::class.qualifiedName,
         Routes.WaitingScreen::class.qualifiedName
     )
+    val userId = remember { mutableStateOf("") }
+    val isLoadind = remember { mutableStateOf(false) }
+    val startScreen = remember(userId.value) {
+        if (userId.value.isEmpty()) {
+            Routes.SignUp
+        } else {
+            Routes.WaitingScreen
+        }
+    }
+    val coroutineScope = rememberCoroutineScope()
+    LaunchedEffect(1) {
+        coroutineScope.launch(Dispatchers.IO) {
+            userId.value = viewModel.getUserIdDirectly().toString()
+        }
+    }
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
-            if(hideBottomBarRoutes.none { currentRoute?.startsWith(it.orEmpty()) == true }){
+            if (hideBottomBarRoutes.none { currentRoute?.startsWith(it.orEmpty()) == true }) {
                 NavigationBar {
 
-                    bottomItems.forEachIndexed {
-                            index, item ->
+                    bottomItems.forEachIndexed { index, item ->
                         NavigationBarItem(
                             selected = selected == index,
                             onClick = {
                                 selected = index
-                                when(selected){
+                                when (selected) {
                                     0 -> navController.navigate(Routes.userAvailableProductRoute)
                                     1 -> navController.navigate(Routes.addProductOrderRoute)
                                     2 -> navController.navigate(Routes.ordersRoute)
@@ -82,11 +101,13 @@ fun navigate(viewModel: MyViewModel) {
                 }
             }
         }
-        ) { innerPadding ->
-        Box(modifier = Modifier
-            .fillMaxSize()
-            .padding(innerPadding)) {
-            NavHost(navController = navController, startDestination = Routes.SignUp) {
+    ) { innerPadding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
+            NavHost(navController = navController, startDestination = startScreen) {
 
                 composable<Routes.SignUp> {
                     SignUpUi(viewModel, navController)
@@ -118,14 +139,14 @@ fun navigate(viewModel: MyViewModel) {
                 }
 
                 composable<Routes.addProductOrderRoute> {
-                    AddProductScreenUi(viewModel,navController)
+                    AddProductScreenUi(viewModel, navController)
                 }
                 composable<Routes.ordersRoute> {
-                    OrderScreenUi(viewModel,navController)
+                    OrderScreenUi(viewModel, navController)
                 }
 
                 composable<Routes.userAvailableProductRoute> {
-                    UserAvailableProductUi(viewModel,navController)
+                    UserAvailableProductUi(viewModel, navController)
                 }
 
                 composable<Routes.userProfileRoute> {
@@ -139,6 +160,8 @@ fun navigate(viewModel: MyViewModel) {
 
     }
 }
+
+
 
 
 data class BottomNavItem(

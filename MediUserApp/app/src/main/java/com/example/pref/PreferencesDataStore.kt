@@ -16,8 +16,8 @@ class PreferencesDataStore(private val context : Context){
         private val User_ID_KEY = stringPreferencesKey("user_id")
 
     }
-    val PrefUserid : Flow<String> = context.dataStore.data.map {
-        it[User_ID_KEY] ?: ""
+    val PrefUserid : Flow<String?> = context.dataStore.data.map {
+        it[User_ID_KEY]
 
     }
     suspend fun saveUserId(userId : String){

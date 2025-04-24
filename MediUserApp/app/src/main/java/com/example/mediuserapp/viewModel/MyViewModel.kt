@@ -14,12 +14,16 @@ import com.example.mediuserapp.Network.response.SpecificProductResponse
 import com.example.mediuserapp.Network.response.SpecificUserResponse
 import com.example.mediuserapp.Network.response.UserAvailableProductResponse
 import com.example.mediuserapp.Repo.Repo
+import com.example.pref.PreferencesDataStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
-class MyViewModel : ViewModel() {
+class MyViewModel(
+    private val preferenceDatastore : PreferencesDataStore
+) : ViewModel() {
     val repo = Repo()
     private val _createUserState = MutableStateFlow<CreateUserState?>(null)
     val createUserState = _createUserState.asStateFlow()
@@ -44,6 +48,10 @@ class MyViewModel : ViewModel() {
     var userName = mutableStateOf("")
 
 
+    suspend fun getUserIdDirectly(): String? {
+        return preferenceDatastore.PrefUserid.first()
+    }
+
     fun createUser(
         name: String,
         password: String,
@@ -61,6 +69,10 @@ class MyViewModel : ViewModel() {
                         }
 
                         is ResultState.Success -> {
+                            if(it.data.status == 200){
+                                preferenceDatastore.saveUserId(it.data.message)
+                            }
+                            preferenceDatastore.saveUserId(it.data.message)
                             _createUserState.value =
                                 CreateUserState(success = it.data, isLoading = false)
                         }
@@ -71,6 +83,8 @@ class MyViewModel : ViewModel() {
                         }
                     }
                 }
+
+
 
         }
     }
@@ -88,6 +102,9 @@ class MyViewModel : ViewModel() {
                     }
 
                     is ResultState.Success -> {
+                        if(it.data.status == 200){
+                            preferenceDatastore.saveUserId(it.data.message)
+                        }
                         _loginUserState.value = LoginUserState(success = it.data, isLoading = false)
                     }
 
