@@ -17,10 +17,21 @@ sealed class Routes{
     @Serializable
     data class HomeScreen(val userId : String) : Routes()
 
-    @Serializable
-    object allProductScreenRoute : Routes()
+
 
     @Serializable
     data class specificProductScreenRoute(val productId : String) : Routes()
+
+    @Serializable
+    object userAvailableProductRoute : Routes()
+
+    @Serializable
+    object addProductOrderRoute : Routes()
+
+    @Serializable
+    object ordersRoute : Routes()
+
+    @Serializable
+    object userProfileRoute : Routes()
 
 }

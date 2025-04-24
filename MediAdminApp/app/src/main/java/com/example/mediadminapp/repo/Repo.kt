@@ -10,8 +10,13 @@ import com.example.mediadminapp.network.response.AllUsersResponse
 import com.example.mediadminapp.network.response.ApproveUserResponse
 import com.example.mediadminapp.network.response.BlockUserResponse
 import com.example.mediadminapp.network.response.CreateProductResponse
+import com.example.mediadminapp.network.response.DeleteProductResponse
+import com.example.mediadminapp.network.response.DeleteUserResponse
+import com.example.mediadminapp.network.response.GetAllOrdersResponse
+import com.example.mediadminapp.network.response.OrderApprovalResponse
 import com.example.mediadminapp.network.response.SpecificProductResponse
 import com.example.mediadminapp.network.response.SpecificUserResponse
+import com.example.mediadminapp.network.response.UpdateProductResponse
 
 
 class Repo {
@@ -100,7 +105,7 @@ class Repo {
         }
     }
 
-    suspend fun getAllProducts() : Flow<ResultState<AllProductsResponse>> = flow {
+    suspend fun getAllProducts(): Flow<ResultState<AllProductsResponse>> = flow {
         emit(ResultState.Loading)
         try {
             val response = ApiProvider.provideApiService().getAllProducts()
@@ -108,21 +113,92 @@ class Repo {
                 emit(ResultState.Success(response.body()!!))
             else
                 emit(ResultState.Error(Exception(response.message())))
-        }
-        catch (e : Exception){
+        } catch (e: Exception) {
             emit(ResultState.Error(e))
         }
     }
 
-    suspend fun getSpecificProduct(product_id : String) : Flow<ResultState<SpecificProductResponse>> = flow {
+    suspend fun getSpecificProduct(product_id: String): Flow<ResultState<SpecificProductResponse>> =
+        flow {
+            emit(ResultState.Loading)
+            try {
+                val response = ApiProvider.provideApiService().getSpecificProduct(product_id)
+                if (response.isSuccessful && response.body() != null)
+                    emit(ResultState.Success(response.body()!!))
+                else
+                    emit(ResultState.Error(Exception(response.message())))
+            } catch (e: Exception) {
+                emit(ResultState.Error(e))
+            }
+        }
+
+    suspend fun deleteProduct(product_id: String): Flow<ResultState<DeleteProductResponse>> = flow {
         emit(ResultState.Loading)
-        try{
-            val response = ApiProvider.provideApiService().getSpecificProduct(product_id)
+        try {
+            val response = ApiProvider.provideApiService().deleteProduct(product_id)
             if (response.isSuccessful && response.body() != null)
                 emit(ResultState.Success(response.body()!!))
             else
                 emit(ResultState.Error(Exception(response.message())))
-        }catch (e : Exception){
+        } catch (e: Exception) {
+            emit(ResultState.Error(e))
+        }
+    }
+
+    suspend fun deleteUser(user_id: String): Flow<ResultState<DeleteUserResponse>> = flow {
+        emit(ResultState.Loading)
+        try {
+            val response = ApiProvider.provideApiService().deleteUser(user_id)
+            if (response.isSuccessful && response.body() != null)
+                emit(ResultState.Success(response.body()!!))
+            else
+                emit(ResultState.Error(Exception(response.message())))
+        } catch (e: Exception) {
+            emit(ResultState.Error(e))
+        }
+    }
+
+    suspend fun getAllOrders(): Flow<ResultState<GetAllOrdersResponse>> = flow {
+        emit(ResultState.Loading)
+        try {
+            val response = ApiProvider.provideApiService().getAllOrders()
+            if (response.isSuccessful && response.body() != null)
+                emit(ResultState.Success(response.body()!!))
+            else
+                emit(ResultState.Error(Exception(response.message())))
+
+        } catch (e: Exception) {
+            emit(ResultState.Error(e))
+        }
+    }
+
+    suspend fun orderApprove(
+        order_id: String,
+        approve: String
+    ): Flow<ResultState<OrderApprovalResponse>> = flow {
+        emit(ResultState.Loading)
+        try {
+            val response = ApiProvider.provideApiService().updateOrderApproval(order_id, approve)
+            if (response.isSuccessful && response.body() != null)
+                emit(ResultState.Success(response.body()!!))
+            else
+                emit(ResultState.Error(Exception(response.message())))
+
+        } catch (e: Exception) {
+            emit(ResultState.Error(e))
+        }
+    }
+
+    suspend fun updateProductStockRepo(product_id: String,name: String,price: String,category: String, stock: String,) : Flow<ResultState<UpdateProductResponse>> = flow {
+        emit(ResultState.Loading)
+        try {
+            val response = ApiProvider.provideApiService().updateProductStock(product_id, name, price, category, stock)
+            if (response.isSuccessful && response.body() != null)
+                emit(ResultState.Success(response.body()!!))
+            else
+                emit(ResultState.Error(Exception(response.message())))
+
+        } catch (e: Exception) {
             emit(ResultState.Error(e))
         }
 

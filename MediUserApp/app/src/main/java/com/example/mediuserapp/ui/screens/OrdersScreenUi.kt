@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialogDefaults.containerColor
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -18,41 +18,43 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.example.mediuserapp.Network.response.MessageProduct
+import com.example.mediuserapp.Network.response.GetAllOrdersResponseMessage
+import com.example.mediuserapp.Network.response.UserAvailableProductMessage
 import com.example.mediuserapp.navigation.Routes
 import com.example.mediuserapp.viewModel.MyViewModel
-import kotlin.toString
-
 
 @Composable
-fun AllProductScreenUi(viewModel: MyViewModel, navController: NavHostController) {
-    val state = viewModel.getAllProductsState.collectAsState()
-    val productList = state.value?.success?.message
-    val productListStatus = state.value?.success?.status
-
+fun OrderScreenUi(viewModel: MyViewModel, navController: NavHostController) {
+    var orderState = viewModel.getAllOrdersState.collectAsState()
+    val orderListStatus = orderState.value?.success?.status
+    var orderList = orderState.value?.success?.message
     LaunchedEffect(1) {
-        viewModel.getAllProducts()
-
+        viewModel.allOrder()
     }
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text("This is order screen list")
         when {
-            state.value?.isLoading == true -> {
+            orderState.value?.isLoading == true -> {
                 CircularProgressIndicator()
             }
 
-            state.value?.error != null -> {
-                Text(text = state.value?.error.toString())
+            orderState.value?.error?.isNotBlank() == true -> {
+                Text(text = orderState.value?.error.toString())
             }
 
-            state.value?.success != null -> {
-                if (productListStatus == 404) {
+            orderState.value?.success != null -> {
+                if (orderListStatus == 404) {
                     Column(
                         modifier = Modifier.fillMaxSize(),
                         verticalArrangement = Arrangement.Center,
@@ -60,15 +62,18 @@ fun AllProductScreenUi(viewModel: MyViewModel, navController: NavHostController)
                     ) {
                         Text("No Product Found")
                     }
-                } else if (productListStatus == 200) {
+                } else if (orderListStatus == 200) {
+                    orderList = orderList?.filter {
+                        it.user_id == viewModel.userId.value
+                    }
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(5.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        items(productList!!) {
-                            productCard(product = it, navController)
+                        items(orderList!!) {
+                            OrderCard(it,navController)
                         }
                     }
                 } else {
@@ -80,22 +85,26 @@ fun AllProductScreenUi(viewModel: MyViewModel, navController: NavHostController)
                         Text("Some error occured")
                     }
                 }
-
             }
         }
     }
-
 }
 
 
 @Composable
-fun productCard(product : MessageProduct,navController: NavHostController){
+fun OrderCard(order: GetAllOrdersResponseMessage, navController: NavHostController) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { navController.navigate(Routes.specificProductScreenRoute(product.product_id)) },
+            .clickable { },
         shape = androidx.compose.foundation.shape.RoundedCornerShape(20.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 10.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 10.dp),
+        colors = CardDefaults.cardColors(
+                   if(order.isApproved == 0)
+                       Color.Red
+                   else
+                       Color.Green
+        )
     ) {
         Column(
             modifier = Modifier
@@ -103,16 +112,16 @@ fun productCard(product : MessageProduct,navController: NavHostController){
                 .padding(10.dp)
         ) {
             Text(buildAnnotatedString {
-                withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)){
-                    append("Name : ")
+                withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                    append("Product name : ")
                 }
-                append(product.name)
+                append(order.product_name)
             })
             Text(buildAnnotatedString {
                 withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                    append("Stock : ")
+                    append("Quantity : ")
                 }
-               append(product.stock.toString())
+                append(order.quantity.toString())
             })
 
         }

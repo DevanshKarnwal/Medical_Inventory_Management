@@ -15,7 +15,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.compose.NavHost
@@ -31,6 +30,7 @@ import com.example.mediadminapp.viewModel.myViewModel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import com.example.mediadminapp.ui.screens.TestUpdate
 import com.example.mediadminapp.ui.screens.orderScreenUi
 
 @Composable
@@ -81,13 +81,17 @@ fun navigate(viewModel: myViewModel) {
             Box(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
                 NavHost(navController = navController, startDestination = Routes.homeScreenRoute) {
 
+                    composable("A") {
+                        TestUpdate(viewModel)
+                    }
+
                     composable<Routes.homeScreenRoute> {
                         AllUsersUi(viewModel, navController)
                     }
 
                     composable<Routes.userDetailScreenRoute> {
                         val args = it.toRoute<Routes.userDetailScreenRoute>()
-                        UserDetailScreen(args.userId, viewModel)
+                        UserDetailScreen(args.userId, viewModel,navController)
                     }
 
                     composable<Routes.addProductScreenRoute> {
@@ -100,7 +104,7 @@ fun navigate(viewModel: myViewModel) {
 
                     composable<Routes.specificProductScreenRoute> {
                         val args = it.toRoute<Routes.specificProductScreenRoute>()
-                        SpecificProductScreenUi(args.productId, viewModel)
+                        SpecificProductScreenUi(args.productId, viewModel, navController)
                     }
 
                     composable<Routes.orderScreenRoute> {

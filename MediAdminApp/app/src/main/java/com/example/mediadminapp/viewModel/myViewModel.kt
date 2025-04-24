@@ -1,5 +1,6 @@
 package com.example.mediadminapp.viewModel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mediadminapp.common.ResultState
@@ -8,8 +9,13 @@ import com.example.mediadminapp.network.response.AllUsersResponse
 import com.example.mediadminapp.network.response.ApproveUserResponse
 import com.example.mediadminapp.network.response.BlockUserResponse
 import com.example.mediadminapp.network.response.CreateProductResponse
+import com.example.mediadminapp.network.response.DeleteProductResponse
+import com.example.mediadminapp.network.response.DeleteUserResponse
+import com.example.mediadminapp.network.response.GetAllOrdersResponse
+import com.example.mediadminapp.network.response.OrderApprovalResponse
 import com.example.mediadminapp.network.response.SpecificProductResponse
 import com.example.mediadminapp.network.response.SpecificUserResponse
+import com.example.mediadminapp.network.response.UpdateProductResponse
 import com.example.mediadminapp.repo.Repo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,6 +39,17 @@ class myViewModel : ViewModel() {
     val getAllProductsState = _getAllProductsState.asStateFlow()
     private val _getSpecificProductState = MutableStateFlow<GetSpecificProduct?>(null)
     val getSpecificProductState = _getSpecificProductState.asStateFlow()
+    private val _deleteProductState = MutableStateFlow<DeleteProduct?>(null)
+    val deleteProductState = _deleteProductState.asStateFlow()
+    private val _deleteUserState = MutableStateFlow<DeleteUser?>(null)
+    val deleteUserState = _deleteUserState.asStateFlow()
+    private val _getAllOrdersState = MutableStateFlow<AllOrders?>(null)
+    val getAllOrdersState = _getAllOrdersState.asStateFlow()
+    private val _approveOrderUpdateState = MutableStateFlow<ApproveOrderUpdate?>(null)
+    val approveOrderUpdateState = _approveOrderUpdateState.asStateFlow()
+    private val _updateProductStock =
+        MutableStateFlow<updateProductStockView?>(null)
+    val updateProductStock = _updateProductStock.asStateFlow()
 
     fun getAllUsers() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -193,6 +210,135 @@ class myViewModel : ViewModel() {
         }
     }
 
+    fun deleteProduct(product_id: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val response = repo.deleteProduct(product_id).collect {
+                when (it) {
+                    is ResultState.Loading -> {
+                        _deleteProductState.value = DeleteProduct(isLoading = true)
+                    }
+
+                    is ResultState.Success -> {
+                        _deleteProductState.value =
+                            DeleteProduct(success = it.data, isLoading = false)
+                    }
+
+                    is ResultState.Error -> {
+                        _deleteProductState.value =
+                            DeleteProduct(error = it.exception.message, isLoading = false)
+                    }
+                }
+            }
+        }
+
+    }
+
+    fun deleteUser(user_id: String) {
+        viewModelScope.launch {
+            val response = repo.deleteUser(user_id).collect {
+                when (it) {
+                    is ResultState.Loading -> {
+                        _deleteUserState.value = DeleteUser(isLoading = true)
+                    }
+
+                    is ResultState.Success -> {
+                        _deleteUserState.value = DeleteUser(success = it.data, isLoading = false)
+                    }
+
+                    is ResultState.Error -> {
+                        _deleteUserState.value =
+                            DeleteUser(error = it.exception.message, isLoading = false)
+                    }
+                }
+            }
+
+        }
+    }
+
+    fun allOrder() {
+        val response = viewModelScope.launch(Dispatchers.IO) {
+            repo.getAllOrders().collect {
+                when (it) {
+                    is ResultState.Loading -> {
+                        _getAllOrdersState.value = AllOrders(isLoading = true)
+                    }
+
+                    is ResultState.Success -> {
+                        _getAllOrdersState.value = AllOrders(success = it.data, isLoading = false)
+                    }
+
+                    is ResultState.Error -> {
+                        _getAllOrdersState.value =
+                            AllOrders(error = it.exception.message, isLoading = false)
+                    }
+                }
+
+            }
+        }
+    }
+
+    fun approveOrderUpdate(order_id: String, approve: Int) {
+        val response = viewModelScope.launch(Dispatchers.IO) {
+            repo.orderApprove(order_id, approve.toString()).collect {
+                when (it) {
+                    is ResultState.Loading -> {
+                        _approveOrderUpdateState.value = ApproveOrderUpdate(isLoading = true)
+                    }
+
+                    is ResultState.Success -> {
+                        _approveOrderUpdateState.value =
+                            ApproveOrderUpdate(success = it.data, isLoading = false)
+                    }
+
+                    is ResultState.Error -> {
+                        _approveOrderUpdateState.value =
+                            ApproveOrderUpdate(error = it.exception.message, isLoading = false)
+                    }
+                }
+            }
+        }
+    }
+
+    fun resetUpdateStockState(){
+        _updateProductStock.value = null
+    }
+    fun updateProductStockAndApproval(product_id: String,name: String,price: String,category: String, stock: String,) {
+        Log.d("TAGA", "updateProductStock: $product_id $stock ")
+        val response = viewModelScope.launch(Dispatchers.IO) {
+            repo.updateProductStockRepo(product_id, name, price, category, stock).collect {
+                when (it) {
+                    is ResultState.Loading -> {
+                        _updateProductStock.value =
+                            updateProductStockView(isLoading = true)
+                    }
+
+                    is ResultState.Success -> {
+                        _updateProductStock.value =
+                            updateProductStockView(success = it.data, isLoading = false)
+                        Log.d("TAGA", "onside success: $product_id $stock ")
+
+                    }
+
+                    is ResultState.Error -> {
+                        _updateProductStock.value =
+                            updateProductStockView(
+                                error = it.exception.message,
+                                isLoading = false
+                            )
+                    }
+                }
+            }
+        }
+    }
+
+    fun clearSpecificProductState(){
+        _getSpecificProductState.value = null
+    }
+    fun clearUpdateState(){
+        _updateProductStock.value = null
+    }
+
+
 }
 
 
@@ -238,3 +384,32 @@ data class GetSpecificProduct(
     val error: String? = null
 )
 
+data class DeleteProduct(
+    val isLoading: Boolean = false,
+    val success: DeleteProductResponse? = null,
+    val error: String? = null
+)
+
+data class DeleteUser(
+    val isLoading: Boolean = false,
+    val success: DeleteUserResponse? = null,
+    val error: String? = null
+)
+
+data class AllOrders(
+    val isLoading: Boolean = false,
+    val success: GetAllOrdersResponse? = null,
+    val error: String? = null
+)
+
+data class ApproveOrderUpdate(
+    val isLoading: Boolean = false,
+    val success: OrderApprovalResponse? = null,
+    val error: String? = null
+)
+
+data class updateProductStockView(
+    val isLoading: Boolean = false,
+    val success: UpdateProductResponse? = null,
+    val error: String? = null
+)

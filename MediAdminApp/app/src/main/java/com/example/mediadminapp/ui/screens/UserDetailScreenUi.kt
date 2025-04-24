@@ -3,14 +3,13 @@ package com.example.mediadminapp.ui.screens
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -23,14 +22,17 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import com.example.mediadminapp.navigation.Routes
 import com.example.mediadminapp.viewModel.myViewModel
 
 @Composable
-fun UserDetailScreen(userId: String, viewModel: myViewModel) {
+fun UserDetailScreen(userId: String, viewModel: myViewModel, navController: NavHostController) {
     val state = viewModel.specificUserState.collectAsState()
     val user = state.value?.success?.message
     val blockUserState = viewModel.blockUserState.collectAsState()
     val approveUserState = viewModel.approveUserState.collectAsState()
+    val deleteState = viewModel.deleteUserState.collectAsState()
     LaunchedEffect(1) {
         viewModel.getSpecificUser(userId)
     }
@@ -50,6 +52,18 @@ fun UserDetailScreen(userId: String, viewModel: myViewModel) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        when{
+            deleteState.value?.isLoading == true -> {
+                CircularProgressIndicator()
+            }
+            deleteState.value?.error != null -> {
+                Text(text = deleteState.value?.error.toString())
+            }
+            deleteState.value?.success != null -> {
+                Text(text = deleteState.value?.success?.message.toString())
+                navController.navigate(Routes.homeScreenRoute)
+            }
+        }
         Text(buildAnnotatedString {
             withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
                 append("Name : ")
@@ -108,7 +122,9 @@ fun UserDetailScreen(userId: String, viewModel: myViewModel) {
         }
 
         Button(
-            onClick = {},
+            onClick = {
+                viewModel.deleteUser(userId)
+            },
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color.Red,
                 contentColor = Color.White

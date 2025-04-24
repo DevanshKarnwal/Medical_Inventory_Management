@@ -43,8 +43,10 @@ fun LoginUi(viewModel: MyViewModel, navController: NavHostController) {
         }
         state.value?.success != null -> {
             Text(text = state.value?.success!!.message)
-            if (state.value?.success!!.status == 200)
-            navController.navigate(Routes.WaitingScreen(state.value?.success!!.message))
+            if (state.value?.success!!.status == 200) {
+                viewModel.userId.value = state.value?.success!!.message
+                navController.navigate(Routes.WaitingScreen(state.value?.success!!.message))
+            }
         }
     }
 

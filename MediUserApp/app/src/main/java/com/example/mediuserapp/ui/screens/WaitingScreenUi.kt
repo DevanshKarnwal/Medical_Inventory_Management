@@ -39,6 +39,7 @@ fun waitingScreen(userId: String, viewModel: MyViewModel, navController: NavHost
 
             state.value?.success != null -> {
                 if (state.value?.success!!.status == 200) {
+                    viewModel.userName.value = state.value?.success!!.message.name
                     if (state.value?.success!!.message.isApproved == 0) {
                         Column(
                             modifier = Modifier.fillMaxSize(),

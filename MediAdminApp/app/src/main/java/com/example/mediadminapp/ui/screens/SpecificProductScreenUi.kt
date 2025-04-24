@@ -20,11 +20,18 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import com.example.mediadminapp.navigation.Routes
 import com.example.mediadminapp.viewModel.myViewModel
 
 @Composable
-fun SpecificProductScreenUi(productId: String, viewModel: myViewModel) {
+fun SpecificProductScreenUi(
+    productId: String,
+    viewModel: myViewModel,
+    navController: NavHostController
+) {
     val state = viewModel.getSpecificProductState.collectAsState()
+    val deleteState = viewModel.deleteProductState.collectAsState()
     val product = state.value?.success?.message
     LaunchedEffect(1) {
         viewModel.getSpecificProduct(productId)
@@ -33,7 +40,7 @@ fun SpecificProductScreenUi(productId: String, viewModel: myViewModel) {
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
-    ){
+    ) {
         when {
             state.value?.isLoading == true -> {
                 CircularProgressIndicator()
@@ -41,6 +48,16 @@ fun SpecificProductScreenUi(productId: String, viewModel: myViewModel) {
 
             state.value?.error != null -> {
                 Text(text = state.value?.error.toString())
+            }
+            deleteState.value?.error != null -> {
+                Text(text = deleteState.value?.error.toString())
+            }
+            deleteState.value?.success != null -> {
+                Text(text = deleteState.value?.success.toString())
+                navController.navigate(Routes.allProductScreenRoute)
+            }
+            deleteState.value?.isLoading == true -> {
+                CircularProgressIndicator()
             }
         }
         Text(buildAnnotatedString {
@@ -69,7 +86,9 @@ fun SpecificProductScreenUi(productId: String, viewModel: myViewModel) {
         })
         Spacer(modifier = Modifier.height(15.dp))
         Button(
-            onClick = {},
+            onClick = {
+                viewModel.deleteProduct(productId)
+            },
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color.Red,
                 contentColor = Color.White
