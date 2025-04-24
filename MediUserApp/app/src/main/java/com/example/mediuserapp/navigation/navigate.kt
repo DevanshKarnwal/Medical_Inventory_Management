@@ -95,7 +95,6 @@ fun navigate(viewModel: MyViewModel) {
                                         1 -> navController.navigate(Routes.addProductOrderRoute)
                                         2 -> navController.navigate(Routes.ordersRoute)
                                         3 -> navController.navigate(Routes.userProfileRoute)
-
                                     }
                                 },
                                 alwaysShowLabel = true,
@@ -157,7 +156,7 @@ fun navigate(viewModel: MyViewModel) {
                     }
 
                     composable<Routes.userProfileRoute> {
-                        userProfileUi(viewModel)
+                        userProfileUi(viewModel,navController)
                     }
 
                 }

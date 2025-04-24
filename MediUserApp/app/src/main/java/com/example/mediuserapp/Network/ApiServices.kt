@@ -9,6 +9,7 @@ import com.example.mediuserapp.Network.response.GetSpecificAvailableProduct
 import com.example.mediuserapp.Network.response.LoginUserResponse
 import com.example.mediuserapp.Network.response.SpecificProductResponse
 import com.example.mediuserapp.Network.response.SpecificUserResponse
+import com.example.mediuserapp.Network.response.UpdateUserResponse
 import com.example.mediuserapp.Network.response.UserAvailableProductResponse
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -16,6 +17,7 @@ import retrofit2.Response
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
+import retrofit2.http.PATCH
 import retrofit2.http.POST
 
 interface ApiServices {
@@ -73,5 +75,17 @@ interface ApiServices {
 
     @GET("getAllOrderDetails")
     suspend fun getAllOrders() : Response<GetAllOrdersResponse>
+
+    @FormUrlEncoded
+    @PATCH("updateUserAllDetails")
+    fun updateUser(
+        @Field("user_id") user_id: String,
+        @Field("name") name: String,
+        @Field("address") address: String,
+        @Field("email") email: String,
+        @Field("phoneNumber") phoneNumber: String,
+        @Field("pincode") pincode: String,
+        @Field("password") password: String,
+    ) : Response<UpdateUserResponse>
 
 }

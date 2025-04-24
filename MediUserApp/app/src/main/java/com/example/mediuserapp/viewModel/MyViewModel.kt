@@ -12,6 +12,7 @@ import com.example.mediuserapp.Network.response.GetSpecificAvailableProduct
 import com.example.mediuserapp.Network.response.LoginUserResponse
 import com.example.mediuserapp.Network.response.SpecificProductResponse
 import com.example.mediuserapp.Network.response.SpecificUserResponse
+import com.example.mediuserapp.Network.response.UpdateUserResponse
 import com.example.mediuserapp.Network.response.UserAvailableProductResponse
 import com.example.mediuserapp.Repo.Repo
 import com.example.pref.PreferencesDataStore
@@ -42,14 +43,18 @@ class MyViewModel(
     val createOrderState = _createOrderState.asStateFlow()
     private val _getAllOrdersState = MutableStateFlow<AllOrders?>(null)
     val getAllOrdersState = _getAllOrdersState.asStateFlow()
-
+    private val _updateUserState = MutableStateFlow<updateUserView?>(null)
+    val updateUserState = _updateUserState.asStateFlow()
 
     var userId = mutableStateOf("")
     var userName = mutableStateOf("")
 
 
-    suspend fun getUserIdDirectly(): String? {
-        return preferenceDatastore.PrefUserid.first()
+    suspend fun getUserIdDirectly(): String {
+
+        val id =  preferenceDatastore.PrefUserid.first() ?: ""
+        userId.value = id
+        return id
     }
 
     fun createUser(
@@ -142,6 +147,10 @@ class MyViewModel(
         }
     }
 
+    fun resetSspecificUser(){
+        _specificUserState.value = null
+    }
+
     fun getSpecificProduct(product_id: String) {
         viewModelScope.launch(Dispatchers.IO) {
             val response = repo.getSpecificAvailableProduct(product_id).collect {
@@ -227,6 +236,8 @@ class MyViewModel(
         _createOrderState.value = null
     }
 
+
+
     fun createOrder(
         user_id: String,
         product_id: String,
@@ -278,6 +289,33 @@ class MyViewModel(
                     is ResultState.Error -> {
                         _getAllOrdersState.value =
                             AllOrders(error = it.exception.message, isLoading = false)
+                    }
+                }
+
+            }
+        }
+    }
+    fun updateUserFunction(
+        user_id: String,
+        name: String,
+        address: String,
+        email: String,
+        phoneNumber: String,
+        pincode: String,
+        password: String,
+    ){
+        val response = viewModelScope.launch(Dispatchers.IO){
+            repo.updateUserResponseRepo(user_id, name, address, email, phoneNumber, pincode, password).collect{
+                when(it){
+                    is ResultState.Loading -> {
+                        _updateUserState.value = updateUserView(isLoading = true)
+                    }
+                    is ResultState.Success -> {
+                        _updateUserState.value = updateUserView(success = it.data, isLoading = false)
+                    }
+                    is ResultState.Error -> {
+                        _updateUserState.value =
+                            updateUserView(error = it.exception.message, isLoading = false)
                     }
                 }
 
@@ -336,5 +374,10 @@ data class AllOrders(
     val isLoading: Boolean = false,
     val success: GetAllOrdersResponse? = null,
     val error: String? = null
+)
 
+data class updateUserView(
+    val isLoading: Boolean = false,
+    val success: UpdateUserResponse? = null,
+    val error: String? = null
 )

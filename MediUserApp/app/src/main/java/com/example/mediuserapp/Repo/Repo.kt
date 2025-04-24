@@ -9,6 +9,7 @@ import com.example.mediuserapp.Network.response.GetAllOrdersResponse
 import com.example.mediuserapp.Network.response.GetSpecificAvailableProduct
 import com.example.mediuserapp.Network.response.LoginUserResponse
 import com.example.mediuserapp.Network.response.SpecificUserResponse
+import com.example.mediuserapp.Network.response.UpdateUserResponse
 import com.example.mediuserapp.Network.response.UserAvailableProductResponse
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -105,14 +106,14 @@ class Repo {
 
     suspend fun createOrder(
         user_id: String,
-        product_id : String,
+        product_id: String,
         quantity: String,
         price: String,
         product_name: String,
         user_name: String,
         message: String,
         category: String,
-    ) : Flow<ResultState<CreateOrderResponse>> = flow{
+    ): Flow<ResultState<CreateOrderResponse>> = flow {
         emit(ResultState.Loading)
         try {
             val response = ApiProvider.provideApiService().createOrderDetails(
@@ -129,15 +130,38 @@ class Repo {
                 emit(ResultState.Success(response.body()!!))
             else
                 emit(ResultState.Error(Exception(response.message())))
-        }catch (e:Exception){
+        } catch (e: Exception) {
             emit(ResultState.Error(e))
         }
     }
 
-    suspend fun getAllOrders(user_id: String): Flow<ResultState<GetAllOrdersResponse>> = flow{
+    suspend fun getAllOrders(user_id: String): Flow<ResultState<GetAllOrdersResponse>> = flow {
         emit(ResultState.Loading)
         try {
             val response = ApiProvider.provideApiService().getAllOrders()
+            if (response.isSuccessful && response.body() != null)
+                emit(ResultState.Success(response.body()!!))
+            else
+                emit(ResultState.Error(Exception(response.message())))
+
+        } catch (e: Exception) {
+            emit(ResultState.Error(e))
+        }
+    }
+
+    suspend fun updateUserResponseRepo(
+        user_id: String,
+        name: String,
+        address: String,
+        email: String,
+        phoneNumber: String,
+        pincode: String,
+        password: String,
+    ): Flow<ResultState<UpdateUserResponse>> = flow {
+        emit(ResultState.Loading)
+        try {
+            val response = ApiProvider.provideApiService()
+                .updateUser(user_id, name, address, email, phoneNumber, pincode, password)
             if (response.isSuccessful && response.body() != null)
                 emit(ResultState.Success(response.body()!!))
             else
